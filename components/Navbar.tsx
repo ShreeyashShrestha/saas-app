@@ -1,9 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
 import Navitems from './Navitems'
 
-const Navbar = () => {
+const Navbar = ({ clerkConfigured }: { clerkConfigured: boolean }) => {
   return (
     <nav className='navbar'>
         <Link href={`/`}>
@@ -13,7 +13,23 @@ const Navbar = () => {
         </Link>
         <div className='flex items-center gap-8'>
             <Navitems />
-            <p>Sign In</p>
+            {clerkConfigured && (
+                <>
+                    <Show when="signed-out">
+                        <div className='flex items-center gap-3'>
+                            <SignInButton mode="redirect">
+                                <button type="button" className='btn-signin'>Sign In</button>
+                            </SignInButton>
+                            <SignUpButton mode="redirect">
+                                <button type="button" className='btn-signin'>Sign Up</button>
+                            </SignUpButton>
+                        </div>
+                    </Show>
+                    <Show when="signed-in">
+                        <UserButton />
+                    </Show>
+                </>
+            )}
         </div>
     </nav>
   )
