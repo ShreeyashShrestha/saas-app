@@ -2,6 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "../supabase";
+import { subjects } from "@/constants";
 
 export const createCompanion = async (formData: CreateCompanion) => {
   const { userId: author } = await auth();
@@ -16,4 +17,51 @@ export const createCompanion = async (formData: CreateCompanion) => {
     throw new Error(error?.message || "failed to create a companion");
 
   return data[0];
+};
+
+export const getAllCompanions = async ({
+  limit = 10,
+  page = 1,
+  subject,
+  topic,
+}: GetAllCompanions) => {
+  const supabase = createSupabaseClient();
+
+  let query = supabase.from("companions").select();
+
+  if (subject && topic) {
+    query = query
+      .ilike("subject", `%${subject}%`)
+      .or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`);
+  } else if (subject) {
+    query = query.ilike("subject", `%${subject}%`);
+  } else if (topic) {
+    query = query.or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`);
+  }
+
+  query = query.range((page - 1) * limit, page * limit - 1);
+
+  const { data: companions, error } = await query;
+
+  if (error) throw new Error(error.message);
+
+  return companions;
+};
+
+export const getCompanion = async (id: string) => {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return null;
+  }
+
+  const supabase = createSupabaseClient();
+
+  const { data, error } = await supabase
+    .from("companions")
+    .select()
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+
+  return data;
 };
