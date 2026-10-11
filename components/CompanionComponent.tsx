@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { Lottie } from "lottie-react";
 import type { ComponentProps, Ref } from "react";
 import soundwaves from "../constants/soundwaves.json";
+import { addToSessionHistory } from "@/lib/actions/companion.actions";
 
 type LottieHandle =
   NonNullable<ComponentProps<typeof Lottie>["lottieRef"]> extends Ref<
@@ -56,8 +57,8 @@ const CompanionComponent = ({
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
 
     const onCallEnd = () => {
-      setCallStatus(CallStatus.INACTIVE);
-      setIsMuted(false);
+      setCallStatus(CallStatus.FINISHED);
+      addToSessionHistory(companionId);
     };
 
     const onMessage = (message: Message) => {
@@ -225,10 +226,7 @@ const CompanionComponent = ({
               );
             } else {
               return (
-                <p
-                  key={index}
-                  className="text-primary max-sm:text-sm"
-                >
+                <p key={index} className="text-primary max-sm:text-sm">
                   {userName}: {message.content}
                 </p>
               );
