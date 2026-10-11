@@ -14,9 +14,9 @@ const Home = async () => {
   const companions = await getAllCompanions({ limit: 3 });
   const recentSessionsCompanions = await getRecentSessions(10);
   return (
-    <div>
+    <div className="mx-5">
       <h1 className="text-2xl underline">Popular Companions</h1>
-      <section className="home-section">
+      <section className="home-section mb-3">
         {companions.map((companion) => (
           <CompanionCard
             key={companion.id}
@@ -26,7 +26,7 @@ const Home = async () => {
         ))}
       </section>
 
-      <section className="home-section">
+      <section className="home-section mb-3">
         <CompanionsList
           title="Recently completed sessions"
           companions={recentSessionsCompanions}
